@@ -5,12 +5,12 @@ const rp = require('request-promise');
 const knex = require('knex')({
     client: 'sqlite3',
     connection: {
-        filename: `${__dirname}/sqlite/master.db`,
+        filename: `${__dirname}/sqlite/detail.db`,
     },
 });
 
 async function read() {
-    const rows = await knex.select("*").from("master");
+    const rows = await knex.select("*").from("detail");
     console.log(rows.length);
     return rows;
 }
@@ -23,10 +23,10 @@ const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
     console.log(`${rows.length}`);
 
     for (let i = 0; i < rows.length; i++) {
-        const item = new RowItem(rows[i], i);
+        const item = new DetailRowItem(rows[i]);
 
         const option = {
-            url: 'https://us-central1-trainbackend2.cloudfunctions.net/api/master',
+            url: 'https://us-central1-trainbackend2.cloudfunctions.net/api/detail',
             method: 'POST',
             form: item.toMap(),
             json: true,
@@ -35,7 +35,7 @@ const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
         const result = await rp(option);
         await sleep(300);
 
-        console.log(`count: ${i}, trainNo: ${result.rlNum}, typeName: ${result.page}`);
+        console.log(`count: ${i}, trainNo: ${result.trainNo}, typeName: ${result.typeName}`);
     }
 
     return true;
